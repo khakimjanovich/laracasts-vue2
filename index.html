@@ -3,15 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        .color-red {
+            color: red;
+        }
+
+        .is-loading {
+            background: red
+        }
+    </style>
 </head>
 <body>
 
 <div id="root">
-    <ul>
-        <li v-for="name in names" v-text="name"></li>
-        <input type="text" v-model="newName">
-        <button id="button" @click="addName">Add name</button>
-    </ul>
+    <h1 :class="className">This is another example for attribute binding</h1>
+    <button :title="title"
+            @clic="method"
+    >
+        Button
+    </button>
+    <button :class="{'is-loading': isLoading }" @click="toggleClass">Click me</button>
 </div>
 
 <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
@@ -20,18 +31,16 @@
     let app = new Vue({
         el: '#root',
         data: {
-            newName: '',
-            names: ['Yunusali', 'Tursunali', 'Hakimjon']
+            title: 'Title is being loaded by JS',
+            className: 'color-red',
+            isLoading: false
         },
-
         methods: {
-            addName() {
-                if (this.newName === '') {
-                    alert('Enter some name')
-                } else {
-                    this.names.push(this.newName)
-                    this.newName = '';
-                }
+            method() {
+                alert('method')
+            },
+            toggleClass() { 
+                this.isLoading = !this.isLoading
             }
         },
     })
