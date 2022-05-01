@@ -2,27 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Computed</title>
     <style>
-        .color-red {
-            color: red;
-        }
-
-        .is-loading {
-            background: red
-        }
     </style>
 </head>
 <body>
 
 <div id="root">
-    <h1 :class="className">This is another example for attribute binding</h1>
-    <button :title="title"
-            @clic="method"
-    >
-        Button
-    </button>
-    <button :class="{'is-loading': isLoading }" @click="toggleClass">Click me</button>
+    <h1>{{reversedMessage}}</h1>
+
+    <h2>All the tasks</h2>
+    <ul>
+        <li v-for="task in tasks">{{task.description}}</li>
+    </ul>
+
+    <h2>Incomplete tasks</h2>
+    <ul>
+        <li v-for="task in incompleteTasks">{{task.description}}</li>
+    </ul>
 </div>
 
 <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
@@ -31,16 +28,23 @@
     let app = new Vue({
         el: '#root',
         data: {
-            title: 'Title is being loaded by JS',
-            className: 'color-red',
-            isLoading: false
+            message: 'Hello world',
+            tasks: [
+                {description: 'Uyg`on', completed: true},
+                {description: 'Yuzingni yuv', completed: false},
+                {description: 'Nonushta qil', completed: false},
+                {description: 'Ishga jona', completed: false},
+                {description: 'Ishni qil', completed: false},
+                {description: 'Uyga kel', completed: false},
+                {description: 'Uxla', completed: false},
+            ]
         },
-        methods: {
-            method() {
-                alert('method')
+        computed: {
+            reversedMessage() {
+                return this.message.split('').reverse().join('')
             },
-            toggleClass() { 
-                this.isLoading = !this.isLoading
+            incompleteTasks() {
+                return this.tasks.filter(task => !task.completed)
             }
         },
     })
