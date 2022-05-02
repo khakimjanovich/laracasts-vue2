@@ -13,10 +13,18 @@
 <body>
 
 <div class="container" id="root">
-    <h1 v-if="couponApplied">You used a coupon</h1>
-    <coupon></coupon>
-<!--    <coupon v-on:applied="onCouponApplied"></coupon>-->
-
+    <modal>
+        <template slot="header">
+            This is the header of the modal
+        </template>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium adipisci atque consectetur minus
+        perferendis qui ratione tempora. Esse fugit impedit magnam odit porro, quo sunt voluptate? Facere in quas
+        voluptas.
+        <template slot="footer">
+            <button class="button is-success">Save changes</button>
+            <button class="button">Cancel</button>
+        </template>
+    </modal>
 </div>
 
 <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
