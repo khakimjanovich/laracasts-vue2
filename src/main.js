@@ -3,8 +3,11 @@
 import Vue from 'vue'
 import App from './App'
 import axios from "axios";
+import Form from './core/Form'
 
-Vue.prototype.$http = axios;
+window.axios = axios;
+window.Form = Form
+
 Vue.config.productionTip = false;
 
 new Vue({

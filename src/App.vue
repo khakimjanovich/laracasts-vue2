@@ -23,7 +23,7 @@
           <div class="control">
             <input class="input {'is-danger':form.errors.has('body')}"
                    type="text"
-                   name="body"
+                    name="body"
                    v-model="form.body"
                    placeholder="Enter project name"
             >
@@ -45,90 +45,7 @@
 </template>
 
 <script>
-import axios from "axios";
 
-class Form {
-  constructor(data) {
-    this.originalData = data;
-    for (let field in data) {
-      this[field] = data[field];
-    }
-    this.errors = new Errors()
-  }
-
-  reset() {
-    for (let field in this.originalData) {
-      this[field] = '';
-    }
-    this.errors.clear()
-  }
-
-  data() {
-    let data = {}
-
-    for (let property in this.originalData) {
-      data[property] = this[property]
-    }
-
-    return data;
-  }
-
-  onSuccess(data) {
-    alert('Created')
-    this.reset()
-  }
-
-  onFail(errors) {
-    this.errors.record(errors)
-  }
-
-  submit(method, uri) {
-    return new Promise((resolve, reject) => {
-      axios[method](uri, this.data())
-        .then(response => {
-          this.onSuccess(response.data);
-          resolve(response.data);
-        })
-        .catch(error => {
-          this.onFail(error.response.data);
-          reject(error.response.data);
-        })
-
-    })
-  }
-}
-
-class Errors {
-  constructor() {
-    this.errors = {}
-  }
-
-  get(field) {
-    if (this.errors[field]) {
-      return this.errors[field][0]
-    }
-  }
-
-  has(field) {
-    return this.errors.hasOwnProperty(field)
-  }
-
-  any() {
-    return !!Object.keys(this.errors).length;
-  }
-
-  record(errors) {
-    this.errors = errors
-  }
-
-  clear(field) {
-    if (field) {
-      delete this.errors[field]
-      return;
-    }
-    this.errors = {}
-  }
-}
 
 export default {
 
