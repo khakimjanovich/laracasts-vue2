@@ -3,36 +3,34 @@
     <div class="card mt-4 p-6">
       <form action="#" @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
         <div class="field">
-          <label class="label">Project name:</label>
+          <label class="label">Project title:</label>
           <div class="control">
-            <input class="input is-danger"
+            <input class="input {'is-danger':form.errors.has('title')}"
                    type="text"
-                   name="name"
-                   v-model="form.name"
+                   name="title"
+                   v-model="form.title"
                    placeholder="Enter project name"
-                   required
             >
           </div>
           <p class="help is-danger"
-             v-text="form.errors.get('name')"
-             v-if="form.errors.has('name')"
+             v-text="form.errors.get('title')"
+             v-if="form.errors.has('title')"
           >
           </p>
         </div>
         <div class="field">
           <label class="label">Project description:</label>
           <div class="control">
-            <input class="input is-danger"
+            <input class="input {'is-danger':form.errors.has('body')}"
                    type="text"
-                   name="description"
-                   v-model="form.description"
+                   name="body"
+                   v-model="form.body"
                    placeholder="Enter project name"
-                   required
             >
           </div>
           <p class="help is-danger"
-             v-text="form.errors.get('description')"
-             v-if="form.errors.has('description')"
+             v-text="form.errors.get('body')"
+             v-if="form.errors.has('body')"
           >
           </p>
         </div>
@@ -59,32 +57,44 @@ class Form {
   }
 
   reset() {
-    for (let field in this.originalData()) {
+    for (let field in this.originalData) {
       this[field] = '';
     }
+    this.errors.clear()
   }
 
   data() {
-    let data = Object.assign({}, this)
-    delete data.originalData;
-    delete data.errors;
+    let data = {}
+
+    for (let property in this.originalData) {
+      data[property] = this[property]
+    }
+
     return data;
   }
 
-  onSuccess(response) {
-    alert(response.data.message)
-    this.errors.clear()
+  onSuccess(data) {
+    alert('Created')
     this.reset()
   }
 
-  onFail(error) {
-    this.errors.record(error.response.data)
+  onFail(errors) {
+    this.errors.record(errors)
   }
 
   submit(method, uri) {
-    axios[method](uri, this.data())
-      .then(this.onSuccess.bind(this))
-      .catch(this.onFail.bind(this))
+    return new Promise((resolve, reject) => {
+      axios[method](uri, this.data())
+        .then(response => {
+          this.onSuccess(response.data);
+          resolve(response.data);
+        })
+        .catch(error => {
+          this.onFail(error.response.data);
+          reject(error.response.data);
+        })
+
+    })
   }
 }
 
@@ -112,8 +122,11 @@ class Errors {
   }
 
   clear(field) {
-    if (field) delete this.errors[field]
-    else this.errors = {}
+    if (field) {
+      delete this.errors[field]
+      return;
+    }
+    this.errors = {}
   }
 }
 
@@ -122,15 +135,17 @@ export default {
   data() {
     return {
       form: new Form({
-        name: '',
-        description: '',
+        title: '',
+        body: '',
       }),
     }
   },
 
   methods: {
     onSubmit() {
-      this.form.submit('post', '/projects/store')
+      this.form.submit('post', 'https://jsonplaceholder.typicode.com/posts')
+        .then(data => alert('Creating from the template'))
+        .catch(error => console.log(error))
     },
   }
 }
