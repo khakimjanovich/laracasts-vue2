@@ -1,21 +1,21 @@
 <template>
   <div id="app" class="container">
     <div class="card mt-4 p-6">
-      <form action="#" @submit.prevent="onSubmit" @keydown="errors.clear($event.target.name)">
+      <form action="#" @submit.prevent="onSubmit" @keydown="form.errors.clear($event.target.name)">
         <div class="field">
           <label class="label">Project name:</label>
           <div class="control">
             <input class="input is-danger"
                    type="text"
                    name="name"
-                   v-model="name"
+                   v-model="form.name"
                    placeholder="Enter project name"
                    required
             >
           </div>
           <p class="help is-danger"
-             v-text="errors.get('name')"
-             v-if="errors.has('name')"
+             v-text="form.errors.get('name')"
+             v-if="form.errors.has('name')"
           >
           </p>
         </div>
@@ -25,20 +25,20 @@
             <input class="input is-danger"
                    type="text"
                    name="description"
-                   v-model="description"
+                   v-model="form.description"
                    placeholder="Enter project name"
                    required
             >
           </div>
           <p class="help is-danger"
-             v-text="errors.get('description')"
-             v-if="errors.has('description')"
+             v-text="form.errors.get('description')"
+             v-if="form.errors.has('description')"
           >
           </p>
         </div>
         <div class="field is-grouped">
           <div class="control">
-            <button class="button is-link" :disabled="errors.any()">Submit</button>
+            <button class="button is-link" :disabled="form.errors.any()">Submit</button>
           </div>
         </div>
       </form>
@@ -47,30 +47,91 @@
 </template>
 
 <script>
+import axios from "axios";
+
+class Form {
+  constructor(data) {
+    this.originalData = data;
+    for (let field in data) {
+      this[field] = data[field];
+    }
+    this.errors = new Errors()
+  }
+
+  reset() {
+    for (let field in this.originalData()) {
+      this[field] = '';
+    }
+  }
+
+  data() {
+    let data = Object.assign({}, this)
+    delete data.originalData;
+    delete data.errors;
+    return data;
+  }
+
+  onSuccess(response) {
+    alert(response.data.message)
+    this.errors.clear()
+    this.reset()
+  }
+
+  onFail(error) {
+    this.errors.record(error.response.data)
+  }
+
+  submit(method, uri) {
+    axios[method](uri, this.data())
+      .then(this.onSuccess.bind(this))
+      .catch(this.onFail.bind(this))
+  }
+}
+
+class Errors {
+  constructor() {
+    this.errors = {}
+  }
+
+  get(field) {
+    if (this.errors[field]) {
+      return this.errors[field][0]
+    }
+  }
+
+  has(field) {
+    return this.errors.hasOwnProperty(field)
+  }
+
+  any() {
+    return !!Object.keys(this.errors).length;
+  }
+
+  record(errors) {
+    this.errors = errors
+  }
+
+  clear(field) {
+    if (field) delete this.errors[field]
+    else this.errors = {}
+  }
+}
+
 export default {
 
   data() {
     return {
-      name: '',
-      description: '',
-      errors: new Error()
+      form: new Form({
+        name: '',
+        description: '',
+      }),
     }
   },
 
   methods: {
     onSubmit() {
-      this.$http.post('/projects/store', {
-        name: this.name,
-        description: this.description
-      }).then(response => this.onSuccess(response))
-        .catch(error => this.errors.record(error.response.data))
+      this.form.submit('post', '/projects/store')
     },
-
-    onSuccess(response) {
-      alert(response.data.message)
-      this.name = ''
-      this.description = ''
-    }
   }
 }
 </script>
