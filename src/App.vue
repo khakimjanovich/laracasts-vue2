@@ -1,17 +1,23 @@
 <template>
   <div id="app">
-    <counter></counter>
+    <ul>
+      <li v-for="skill in skills" v-text="skill"></li>
+    </ul>
   </div>
 </template>
 
 <script>
-import counter from "./components/Counter";
+
+import axios from "axios";
 
 export default {
-  name: 'App',
-  components: {counter},
   data() {
-    return {}
+    return {
+      skills: []
+    }
+  },
+  mounted() {
+    this.$http.get('/skills').then(response => this.skills = response.data)
   }
 }
 </script>
